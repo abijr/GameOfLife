@@ -1,12 +1,52 @@
 package game
 
+import (
+	"fmt"
+	"strings"
+)
+
 // Player implements the Play method
 type Player interface {
-	Play(chan [][]bool)
+	Play(chan struct{}) chan Player
 }
 
+// A simple game of life 'Player'
 type Simple struct {
 	world [][]bool
+}
+
+func (s Simple) Play(done chan struct{}) chan Player {
+	world := iterate(s.world)
+	generations := make(chan Player)
+
+	go func() {
+		defer fmt.Println("Exiting goroutine.")
+		for {
+			select {
+			case generations <- Simple{world}:
+				world = iterate(world)
+			case _, ok := <-done:
+				if !ok {
+					return
+				}
+			}
+		}
+	}()
+	return generations
+}
+
+func (s Simple) String() string {
+	rows := make([]string, len(s.world))
+	for i, row := range s.world {
+		rows[i] = fmt.Sprint(row)
+	}
+
+	return strings.Join(rows, "\n")
+
+}
+
+func New(w [][]bool) Player {
+	return Simple{w}
 }
 
 func iterate(current [][]bool) [][]bool {
@@ -21,18 +61,4 @@ func iterate(current [][]bool) [][]bool {
 	}
 
 	return nextgen
-}
-
-func (s Simple) Play(c chan [][]bool) {
-	world := s.world
-
-	for {
-		world = iterate(world)
-		c <- world
-
-	}
-}
-
-func New(w [][]bool) Player {
-	return Simple{w}
 }
