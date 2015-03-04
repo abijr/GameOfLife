@@ -1,0 +1,19 @@
+<div class="container">
+  <br>
+  <div class="jumbotron text-center">
+    <h1>Welcome to the Game of Life.</h1>
+  </div>
+
+  <div class="row" id="world">
+    <div ng-repeat="row in cells">
+      <div class="col-sm-1 cell" ng-class="{alive: c}" ng-style="cellStyle" ng-repeat="c in row track by $index" ng-click="cells[$parent.$index][$index] = !cells[$parent.$index][$index]"></div>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="footer">
+    <p>With ♥ from <a href="https://twitter.com/Swiip">@Swiip</a></p>
+  </div>
+
+</div>
