@@ -6,12 +6,13 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/GeertJohan/go.rice"
 	"github.com/abijr/GameOfLife/game"
 )
 
 func main() {
 	log.Println("Running webapp at http://localhost:8080")
-	http.Handle("/", http.FileServer(http.Dir("./static/dist/")))
+	http.Handle("/", http.FileServer(rice.MustFindBox("static/dist").HTTPBox()))
 	http.HandleFunc("/play", play)
 	http.ListenAndServe(":8080", nil)
 }
