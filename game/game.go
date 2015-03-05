@@ -1,20 +1,25 @@
 package game
 
-import (
-	"fmt"
-	"strings"
-)
+import "fmt"
 
 // Player implements the Play method
 type Player interface {
 	Play(chan struct{}) chan Player
+	World() [][]bool
 }
 
-// A simple game of life 'Player'
+// Simple is a simple game of life 'Player'
 type Simple struct {
 	world [][]bool
 }
 
+func (s Simple) World() [][]bool {
+	return s.world
+}
+
+// Play plays the given 'Simple' game of life in
+// a concurrent manner. Close 'done' channel to
+// terminate goroutine.
 func (s Simple) Play(done chan struct{}) chan Player {
 	world := iterate(s.world)
 	generations := make(chan Player)
@@ -36,17 +41,14 @@ func (s Simple) Play(done chan struct{}) chan Player {
 }
 
 func (s Simple) String() string {
-	rows := make([]string, len(s.world))
-	for i, row := range s.world {
-		rows[i] = fmt.Sprint(row)
-	}
-
-	return strings.Join(rows, "\n")
+	return fmt.Sprint(s.world)
 
 }
 
-func New(w [][]bool) Player {
-	return Simple{w}
+// New returns a new Game Of Life 'Player'
+// using the given world as a starting point
+func New(world [][]bool) Player {
+	return Simple{world}
 }
 
 func iterate(current [][]bool) [][]bool {
